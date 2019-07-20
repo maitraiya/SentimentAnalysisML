@@ -1,6 +1,5 @@
 import tweepy
 import imp
-from textblob import TextBlob
 import re
 import nltk
 nltk.download('stopwords')
