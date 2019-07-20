@@ -1,1 +1,1 @@
-web: gunicorn sentimentanalysisML:app
+web: gunicorn SentimentAnalysisML:app
