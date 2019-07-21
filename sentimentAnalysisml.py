@@ -10,54 +10,21 @@ from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 from nltk.stem import WordNetLemmatizer
 from flask import Flask,render_template,request
+import os
 
-consumer_key = 'xyUBSI0D0JUlMjp3XziEcxNlv'
-consumer_secret = 'qUM4ZnFRWcdreStbaNY5VebhhbwAo8vWiyo1DlpSBT1FczJiTM'
+consumer_key = os.environ['consumer_key_value']
+consumer_secret = os.environ['consumer_secret_value']
 
-access_token = '839828874959650817-nbPlOHAE2Jc2R6Akv1RWgNbR0HFqfFy'
-access_token_secret = 'oAnRvKfTBo7KjSO4xTAag5GsJOGwVEiEZXnejyWtVQe5K'
+access_token = os.environ['access_token_value']
+access_token_secret = os.environ['access_token_secret_value']
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 
-# import RESTAURANT_REVIEWS dataset by using pandas
-dataset = pd.read_csv('Restaurant_Reviews.tsv', delimiter = '\t',quoting =3)
-#saving the reviews in x variable
-x = dataset.iloc[:, 0]
-#saving the sentiments in y variable
-y = dataset.iloc[:, 1]
 
-corpus = []
-#loop for reading reviews and clean them
-for i in range(0, 1000):
-    #removing the elements and symbols which are listed in re.sub() by taking x as input and converting it in string
-    review = re.sub("(@[A-Za-z]+)|([^A-Za-z \t])|(\w+:\/\/\S+)", " ", str(x[i]))
-    #lower casing the review
-    review = review.lower()
-    #spliting the review in tokens
-    review = review.split()
-    #stemming the words in review separately
-    ps = PorterStemmer()
-    #stemming words and removing stopwords
-    review = [ps.stem(word) for word in review if not word in set(stopwords.words('english'))]
-    #joining the words and again forming the review in sentence
-    review = ' '.join(review)
-    #storing all the review in corpus list
-    corpus.append(review)
-
-#forming bag of words model
-from sklearn.feature_extraction.text import CountVectorizer
-bow_vectorizer = CountVectorizer(max_features=None, stop_words='english')
-# bag-of-words feature matrix
-#converting each word in vector form for calculation of sentiments
-x = bow_vectorizer.fit_transform(corpus).toarray()
-y = dataset.iloc[:, 1].values
-
-#Building the model with gaussianNB
-from sklearn.naive_bayes import GaussianNB
-classifier = GaussianNB()
-#training the model by providing x as review and y as sentiments
-classifier.fit(x,y)
+from sklearn.externals import joblib
+classifier = joblib.load('model')
+bow_vectorizer=joblib.load('vocab')
 
 combi =[]
 
