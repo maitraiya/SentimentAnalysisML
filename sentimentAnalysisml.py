@@ -31,6 +31,7 @@ combi =[]
 app=Flask(__name__,template_folder='template')
 @app.route('/')
 def tweets():
+    train_tweets=[]
     query = 'Machine Learning'
     public_tweets = api.search(query,count = 100,lang='en',result_type="recent")
 
@@ -56,10 +57,11 @@ def tweets():
         ps = PorterStemmer()
         review = [ps.stem(word) for word in tweett if not word in set(stopwords.words('english'))]
         tweett = ' '.join(review)
+        train_tweets.append(tweett)
         tweetlist.append(tweet.text)
 
     from sklearn.feature_extraction.text import CountVectorizer
-    z = bow_vectorizer.transform(tweetlist).toarray()
+    z = bow_vectorizer.transform(train_tweets).toarray()
     y_pred = classifier.predict(z)
     i=0
     for tweett in tweetlist:
@@ -78,7 +80,7 @@ def tweets():
 
 @app.route('/tweetsdisplay.html',methods=["POST","GET"])
 def tweetsdisplay():
-
+    train_tweets=[]
     query = request.form.get('query')
     public_tweets = api.search(query,count = 100,lang='en',result_type="recent")
 
@@ -104,10 +106,11 @@ def tweetsdisplay():
         ps = PorterStemmer()
         review = [ps.stem(word) for word in tweett if not word in set(stopwords.words('english'))]
         tweett = ' '.join(review)
+        train_tweets.append(tweett)
         tweetlist.append(tweet.text)
 
     from sklearn.feature_extraction.text import CountVectorizer
-    z = bow_vectorizer.transform(tweetlist).toarray()
+    z = bow_vectorizer.transform(train_tweets).toarray()
     y_pred = classifier.predict(z)
     i=0
     for tweett in tweetlist:
